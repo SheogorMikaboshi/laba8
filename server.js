@@ -18,7 +18,7 @@ async function connectDB() {
   await client.connect();
   db = client.db('repairworks');
   console.log('Connected to MongoDB');
-  
+
   // Инициализация начальных данных (если коллекции пустые)
   await initializeData();
 }
@@ -218,7 +218,7 @@ app.delete('/delete_order/:order_id', requireAuth, requireAdmin, async (req, res
   try {
     const { order_id } = req.params;
     const result = await db.collection('orders').deleteOne({ _id: new ObjectId(order_id) });
-    
+
     if (result.deletedCount === 0) {
       return res.status(404).json({ error: 'Заказ не найден' });
     }
