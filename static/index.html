@@ -1,0 +1,57 @@
+isValid = false;
+                        }
+                    });
+                    
+                    if (!isValid) {
+                        showAlert('Пожалуйста, заполните все обязательные поля', 'error');
+                        return;
+                    }
+                    
+                    try {
+                        const formData = new FormData(this);
+                        const materials = Array.from(this.querySelectorAll('input[name="materials"]:checked')).map(el => el.value);
+                        
+                        const response = await fetch('/create_order', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                client_id: formData.get('client_id'),
+                                contractor_id: formData.get('contractor_id'),
+                                object_id: formData.get('object_id'),
+                                user_id: formData.get('user_id'),
+                                materials: materials
+                            })
+                        });
+                        
+                        if (response.ok) {
+                            showAlert('Заказ успешно создан!', 'success');
+                            // Обновляем данные
+                            const dataResponse = await fetch('/api/data');
+                            appData = await dataResponse.json();
+                            updateUI();
+                            this.reset();
+                        } else {
+                            const error = await response.json();
+                            showAlert(error.message || 'Ошибка при создании заказа', 'error');
+                        }
+                    } catch (error) {
+                        showAlert('Ошибка при создании заказа', 'error');
+                        console.error('Error:', error);
+                    }
+                });
+
+                // Сброс ошибок при выборе
+                document.querySelectorAll('.required-select').forEach(select => {
+                    select.addEventListener('change', function() {
+                        if (this.value) {
+                            this.classList.remove('error');
+                        }
+                    });
+                });
+            }
+        }
+    </script>
+</body>
+</html>
